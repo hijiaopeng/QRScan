@@ -1,9 +1,9 @@
 package com.jiaopeng.qrscan
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.huantansheng.easyphotos.EasyPhotos
 import com.huantansheng.easyphotos.callback.SelectCallback
 import com.huantansheng.easyphotos.constant.Type
@@ -45,4 +45,5 @@ class MainActivity : AppCompatActivity(), ScanResult {
     override fun onScanResult(result: String) {
         Log.e("TAG", "扫描结果：${result}")
     }
+
 }

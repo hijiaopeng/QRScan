@@ -20,6 +20,7 @@ class ZXingBarcodeAnalyzer(
     private var isScanning = AtomicBoolean(false)
 
     override fun analyze(image: ImageProxy) {
+
         if (isScanning.get()) {
             image.close()
             return
