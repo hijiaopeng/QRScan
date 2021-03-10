@@ -44,13 +44,11 @@
     * scanResult：扫描回调监听，子线程，处理UI或吐司，需要自行切到主线程
     * scannerSDK：配置扫描模式：ScannerSDK.ZXING 或 ScannerSDK.MLKIT
     */
-   fun PreviewView.useCamera2Scan(
-       context: AppCompatActivity,
-       scanResult: ScanResult? = null,
-       scannerSDK: ScannerSDK = ScannerSDK.ZXING
-   ) {
-    ...
-   }
+   scanCameraPreview?.useCamera2Scan(
+               this@MainActivity,
+               this,
+               ScannerSDK.MLKIT
+           )
    ```
 
 3. 暂时不支持循环扫描，如果需要重置扫描，调用reScan(scanResult: ScanResult? = null) 方法。注意：回调如果重置之后的处理和useCamera2Scan一致，建议和useCamera2Scan函数使用同一个。
@@ -63,5 +61,5 @@
 2. 选择完图片后，可以直接调用analyzeQRCode2String(context: Context, imagePath: String)方法。在Android Q下，可直接传入content://media格式路径，方法里面已做处理。
 
    ```kotlin
-   val r = analyzeQRCode2String(this@MainActivity, paths?.firstOrNull() ?: "")
+   val r = analyzeQRCode2String(this@MainActivity, "图片地址")
    ```
