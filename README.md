@@ -18,7 +18,7 @@
 
    ```kotlin
    dependencies {
-   	        implementation 'com.github.hijiaopeng:QRScan:1.0.0'
+   	        implementation 'com.github.hijiaopeng:QRScan:1.1.0'
    	}
    ```
 
