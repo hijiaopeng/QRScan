@@ -27,6 +27,7 @@ import com.google.zxing.qrcode.QRCodeReader
 import java.io.ByteArrayOutputStream
 import java.lang.Boolean.TRUE
 import java.util.*
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
@@ -36,7 +37,7 @@ import java.util.concurrent.Executors
  * @author JiaoPeng by 1/12/21
  */
 var analyzer: ImageAnalysis.Analyzer? = null
-val cameraExecutor = Executors.newSingleThreadExecutor()
+var cameraExecutor: ExecutorService? = null
 val preview = Preview.Builder().build()
 val cameraSelector = CameraSelector.Builder()
     .requireLensFacing(CameraSelector.LENS_FACING_BACK)
@@ -61,6 +62,9 @@ fun PreviewView.useCamera2Scan(
     scannerSDK: ScannerSDK = ScannerSDK.ZXING
 ) {
     mScannerSDK = scannerSDK
+    if (null == cameraExecutor) {
+        cameraExecutor = Executors.newSingleThreadExecutor()
+    }
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
     cameraProviderFuture.addListener({
         val cameraProvider = cameraProviderFuture.get()
@@ -91,7 +95,7 @@ fun PreviewView.useCamera2Scan(
             }
         }
         analyzer?.let {
-            imageAnalysis.setAnalyzer(cameraExecutor, it)
+            cameraExecutor?.let { it1 -> imageAnalysis.setAnalyzer(it1, it) }
         }
         preview.setSurfaceProvider(this.surfaceProvider)
         val camera =
@@ -117,14 +121,18 @@ fun reScan(scanResult: ScanResult? = null) {
         imageAnalysis.clearAnalyzer()
         when (mScannerSDK) {
             ScannerSDK.ZXING -> {
-                imageAnalysis.setAnalyzer(cameraExecutor, ZXingBarcodeAnalyzer {
-                    scanResult?.onScanResult(it)
-                })
+                cameraExecutor?.let {
+                    imageAnalysis.setAnalyzer(it, ZXingBarcodeAnalyzer {
+                        scanResult?.onScanResult(it)
+                    })
+                }
             }
             ScannerSDK.MLKIT -> {
-                imageAnalysis.setAnalyzer(cameraExecutor, MLKitBarcodeAnalyzer {
-                    scanResult?.onScanResult(it)
-                })
+                cameraExecutor?.let {
+                    imageAnalysis.setAnalyzer(it, MLKitBarcodeAnalyzer {
+                        scanResult?.onScanResult(it)
+                    })
+                }
             }
         }
     }, 3000)
@@ -137,7 +145,8 @@ fun reScan(scanResult: ScanResult? = null) {
  * @descripion：销毁二维码扫描
  */
 fun destroyCamera2Scan() {
-    cameraExecutor.shutdown()
+    cameraExecutor?.shutdown()
+    cameraExecutor = null
 }
 
 /**
