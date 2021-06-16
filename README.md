@@ -18,7 +18,7 @@
 
    ```kotlin
    dependencies {
-   	        implementation 'com.github.hijiaopeng:QRScan:1.1.0'
+   	        implementation 'com.github.hijiaopeng:QRScan:1.2.0'
    	}
    ```
 
@@ -63,3 +63,7 @@
    ```kotlin
    val r = analyzeQRCode2String(this@MainActivity, "图片地址")
    ```
+#### 其他：
+
+库中已经引入华为的统一扫码服务（Scan Kit），具体使用方式看：
+https://developer.huawei.com/consumer/cn/doc/development/HMSCore-Guides-V5/service-introduction-0000001050041994-V5
