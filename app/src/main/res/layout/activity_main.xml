@@ -9,6 +9,8 @@
     <androidx.camera.view.PreviewView
         android:id="@+id/scanCameraPreview"
         android:layout_width="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_height="match_parent" />
 
     <Button
@@ -16,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="选择图片"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

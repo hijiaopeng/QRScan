@@ -47,6 +47,7 @@ val imageAnalysis = ImageAnalysis.Builder()
     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
     .build()
 var mScannerSDK: ScannerSDK = ScannerSDK.ZXING
+private var hasOne = false
 
 /**
  * @data： 1/18/21 11:25 AM
@@ -61,6 +62,7 @@ fun PreviewView.useCamera2Scan(
     scanResult: ScanResult? = null,
     scannerSDK: ScannerSDK = ScannerSDK.ZXING
 ) {
+    hasOne = false
     mScannerSDK = scannerSDK
     if (null == cameraExecutor) {
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -85,12 +87,18 @@ fun PreviewView.useCamera2Scan(
         analyzer = when (scannerSDK) {
             ScannerSDK.ZXING -> {
                 ZXingBarcodeAnalyzer {
-                    scanResult?.onScanResult(it)
+                    if (!hasOne) {
+                        hasOne = !hasOne
+                        scanResult?.onScanResult(it)
+                    }
                 }
             }
             ScannerSDK.MLKIT -> {
                 MLKitBarcodeAnalyzer {
-                    scanResult?.onScanResult(it)
+                    if (!hasOne) {
+                        hasOne = !hasOne
+                        scanResult?.onScanResult(it)
+                    }
                 }
             }
         }
@@ -115,27 +123,33 @@ fun PreviewView.useCamera2Scan(
  * @param：
  * @descripion：重置扫描
  *              注意：回调如果重置之后的处理和useCamera2Scan一致，建议和useCamera2Scan函数使用同一个
+ *             调用这个方法时，可以考虑在此方法外层套一层延迟，建议5秒
  */
 fun reScan(scanResult: ScanResult? = null) {
-    Handler(Looper.getMainLooper()).postDelayed({
-        imageAnalysis.clearAnalyzer()
-        when (mScannerSDK) {
-            ScannerSDK.ZXING -> {
-                cameraExecutor?.let {
-                    imageAnalysis.setAnalyzer(it, ZXingBarcodeAnalyzer {
-                        scanResult?.onScanResult(it)
-                    })
-                }
-            }
-            ScannerSDK.MLKIT -> {
-                cameraExecutor?.let {
-                    imageAnalysis.setAnalyzer(it, MLKitBarcodeAnalyzer {
-                        scanResult?.onScanResult(it)
-                    })
-                }
+    hasOne = false
+    imageAnalysis.clearAnalyzer()
+    when (mScannerSDK) {
+        ScannerSDK.ZXING -> {
+            cameraExecutor?.let {
+                imageAnalysis.setAnalyzer(it, ZXingBarcodeAnalyzer { it1 ->
+                    if (!hasOne) {
+                        hasOne = !hasOne
+                        scanResult?.onScanResult(it1)
+                    }
+                })
             }
         }
-    }, 3000)
+        ScannerSDK.MLKIT -> {
+            cameraExecutor?.let {
+                imageAnalysis.setAnalyzer(it, MLKitBarcodeAnalyzer { it1 ->
+                    if (!hasOne) {
+                        hasOne = !hasOne
+                        scanResult?.onScanResult(it1)
+                    }
+                })
+            }
+        }
+    }
 }
 
 /**
